@@ -13,6 +13,7 @@ execution of quantum error correction algorithms. All syndrome and correction da
 bit-packed uint64 integers with a maximum size of 64 bits.
 """
 
+from hashlib import md5
 from typing import no_type_check
 
 from guppylang.decorator import guppy
@@ -24,6 +25,12 @@ from guppy_gpu.decorator import gpu, gpu_module
 ######################################
 #   GPU DECODER LIBRARY INTERFACE    #
 ######################################
+
+
+def mkhash(x: bytes) -> int:
+    """Make a 32-bit hash from bytes."""
+    hsh = md5(x).digest()
+    return int.from_bytes(hsh[:4], byteorder="little")
 
 
 @gpu_module("cudaq-qec", None)
@@ -44,9 +51,9 @@ class Decoder:
 
     """
 
-    @gpu
+    @gpu(mkhash(b"enqueue_syndromes_ui64"))
     @no_type_check
-    def enqueue_syndromes_ui64(
+    def enqueue_syndromes(
         self: "Decoder", decoder_id: int, syndrome_size: int, syndrome: int, tag: int
     ) -> None:
         """Enqueue a syndrome for decoding.
@@ -61,8 +68,8 @@ class Decoder:
 
         """
 
-    @gpu
-    def reset_decoder_ui64(self: "Decoder", decoder_id: int) -> None:
+    @gpu(mkhash(b"reset_decoder_ui64"))
+    def reset_decoder(self: "Decoder", decoder_id: int) -> None:
         """Reset the decoder. Clears any queued syndromes and resets corrections to 0.
 
         Args:
@@ -70,9 +77,9 @@ class Decoder:
 
         """
 
-    @gpu
+    @gpu(mkhash(b"get_corrections_ui64"))
     @no_type_check
-    def get_corrections_ui64(
+    def get_corrections(
         self: "Decoder", decoder_id: int, return_size: int, reset: int
     ) -> int:
         """Get the corrections for a given decoder.
