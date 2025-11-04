@@ -20,7 +20,7 @@ class FirstArgNotModule(GpuError):
 
 
 @dataclass(frozen=True)
-class UnconvertableType(GpuError):
+class UnconvertibleType(GpuError):
     span_label: ClassVar[str] = (
         "GPU function signature contained an unsupported type: `{ty}`"
     )

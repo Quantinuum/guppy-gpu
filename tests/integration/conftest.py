@@ -118,7 +118,8 @@ def run_nat_fn():
 @pytest.fixture
 def run_float_fn_approx():
     """Like run_int_fn, but takes optional additional parameters `rel`, `abs`
-    and `nan_ok` as per `pytest.approx`."""
+    and `nan_ok` as per `pytest.approx`.
+    """
     run_fn = _emulate_fn(ty="float")
 
     def run_approx(

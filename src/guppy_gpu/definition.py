@@ -28,7 +28,7 @@ from tket_exts import gpu
 
 from guppy_gpu.errors import (
     FirstArgNotModule,
-    UnconvertableType,
+    UnconvertibleType,
 )
 
 if TYPE_CHECKING:
@@ -49,13 +49,13 @@ class RawGpuFunctionDef(RawCustomFunctionDef):
                 raise GuppyError(FirstArgNotModule(loc, ty))
         for inp in fun_ty.inputs[1:]:
             if not self.is_valid_gpu_type(inp.ty):
-                raise GuppyError(UnconvertableType(loc, inp.ty))
+                raise GuppyError(UnconvertibleType(loc, inp.ty))
         if not self.is_valid_gpu_type(fun_ty.output):
             match fun_ty.output:
                 case NoneType():
                     pass
                 case _:
-                    raise GuppyError(UnconvertableType(loc, fun_ty.output))
+                    raise GuppyError(UnconvertibleType(loc, fun_ty.output))
 
     def is_valid_gpu_type(self, ty: Type) -> bool:
         match ty:
@@ -72,7 +72,7 @@ class RawGpuFunctionDef(RawCustomFunctionDef):
 
 @dataclass(frozen=True)
 class ConstGpuModule(val.ExtensionValue):
-    """Python wrapper for the tket ConstGpuModule type"""
+    """Python wrapper for the tket ConstGpuModule type."""
 
     gpu_file: str
     gpu_config: str | None
@@ -108,8 +108,8 @@ class GpuModuleTypeDef(OpaqueTypeDef):
         gpu_config: str | None = None,
     ) -> None:
         super().__init__(id, name, defined_at, [], True, True, self.to_hugr)
-        self.gpu_file = gpu_file
-        self.gpu_config = gpu_config
+        self.gpu_file: str = gpu_file
+        self.gpu_config: str = gpu_config
 
     def to_hugr(
         self, args: Sequence[TypeArg | ConstArg], _: ToHugrContext, /

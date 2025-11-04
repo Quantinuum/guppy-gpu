@@ -4,7 +4,7 @@ GPU decoding with [Guppy](https://guppylang.org/).
 
 ## Usage
 
-See `src/guppy_gpu/api.py`.
+See `src/guppy_gpu/cudaq_qec.py`.
 
 ## Build and Install
 
