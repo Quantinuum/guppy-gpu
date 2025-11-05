@@ -1,34 +1,22 @@
 # guppy-gpu
 
-GPU decoding with [Guppy](https://guppylang.org/).
+Realtime GPU decoding with [Guppy](https://guppylang.org/) on Quantinuum hardware.
 
 ## Usage
 
-See `src/guppy_gpu/cudaq_qec.py`.
+See [`src/guppy_gpu/cudaq_qec.py`](./src/guppy_gpu/cudaq_qec.py).
 
-## Build and Install
+## Installation
 
-This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
-
-```sh
-uv build
-```
-
-Then `pip install` the `guppy_gpu-0.1.0-py3-none-any.whl` in your Guppy project
-environment.
-
-<!--
-## Sample
-
-`sample.py` includes a sample Guppy GPU program. You may generate compiled hugr
-output using:
+Install using `pip` in your Guppy project environment:
 
 ```sh
-uv run sample.py > sample.hugr
+pip install git+https://github.com/CQCL/guppy-gpu.git
 ```
--->
 
 ## Development
+
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
 ```sh
 # Create virtual environment and install dependencies
