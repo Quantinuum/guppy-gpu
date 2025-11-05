@@ -1,7 +1,9 @@
-"""CUDA-Q QEC GPU Decoder Interface.
+"""CUDA-Q QEC Realtime Decoding API in Guppy.
 
-This module provides a Guppy interface for GPU-accelerated syndrome decoding using the CUDA-Q QEC
-library running on Quantinuum hardware. It includes:
+An implementation of the C++ API at:
+https://github.com/NVIDIA/cudaqx/blob/7eae5b2/libs/qec/include/cudaq/qec/realtime/decoding.h
+
+This module provides a Guppy interface for GPU-accelerated realtime decoding. It includes:
 
 - A `Decoder` class that wraps GPU-accelerated decoding functionality for processing syndromes and
     retrieving corrections in bit-packed integer format.
@@ -35,11 +37,10 @@ def mkhash(x: bytes) -> int:
 
 @gpu_module("cudaq-qec", None)
 class Decoder:
-    """A decoder class for quantum error correction that provides GPU-accelerated syndrome decoding.
+    """Realtime decoding using Nvidia GPUs on Quantinuum hardware.
 
-    This class enables enqueueing syndromes, retrieving corrections, and resetting decoder state
-    for quantum error correction codes. All methods are GPU-accelerated and operate on bit-packed
-    integer representations of syndromes and corrections.
+    Corresponds to the CUDA-Q QEC Realtime decoding API at
+    https://github.com/NVIDIA/cudaqx/blob/7eae5b2/libs/qec/lib/realtime/quantinuum/quantinuum_decoding.h
 
     The decoder maintains internal state for multiple decoder instances, each identified by a
     unique `decoder_id`. Syndromes are enqueued for processing, and corrections (detected bit flips)
@@ -60,20 +61,11 @@ class Decoder:
 
         Args:
             decoder_id (int): The ID of the decoder to use.
-            syndrome_size (int): The size of the syndrome (in bits). Must be <= 64.
-            syndrome (int): The bit-packed syndrome to enqueue. The least significant
-                            bit (syndrome & 1) is the first bit of the syndrome.
-                            The last valid bit is syndrome_size - 1.
+            syndrome_size (int): The size of the syndrome (in bits). This must be <= 64.
+            syndrome (int): The bit-packed syndrome to enqueue. The least significant bit
+                            (i.e. syndrome & 1) is the first bit of the syndrome. The last valid bit
+                            is `syndrome_size - 1` (i.e. syndrome & (1 << (syndrome_size - 1)).
             tag (int): The tag to use for the syndrome (logging only).
-
-        """
-
-    @gpu(mkhash(b"reset_decoder_ui64"))
-    def reset_decoder(self: "Decoder", decoder_id: int) -> None:
-        """Reset the decoder. Clears any queued syndromes and resets corrections to 0.
-
-        Args:
-            decoder_id (int): The ID of the decoder to reset.
 
         """
 
@@ -86,11 +78,24 @@ class Decoder:
 
         Args:
             decoder_id (int): The ID of the decoder to use.
-            return_size (int): The number of bits to return (in bits). Must be <= 64.
+            return_size (int): The number of bits to return (in bits). This must be <= 64. This is
+                               expected to match the number of observables in the decoder. The least
+                               significant bit (i.e. return_value & 1) is the first bit of the
+                               corrections. The last valid bit is `return_size - 1`.
             reset (int): Whether to reset the decoder corrections after retrieving them.
 
         Returns:
-            int: The corrections (detected bit flips) for the given decoder.
+            int: The corrections (detected bit flips) for the given decoder, based on all of the
+                 decoded syndromes since the last time any corrections were reset.
+
+        """
+
+    @gpu(mkhash(b"reset_decoder_ui64"))
+    def reset_decoder(self: "Decoder", decoder_id: int) -> None:
+        """Reset the decoder. This clears any queued syndromes and resets any corrections back to 0.
+
+        Args:
+            decoder_id (int): The ID of the decoder to reset.
 
         """
 
