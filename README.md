@@ -11,7 +11,7 @@ See [`src/guppy_gpu/cudaq_qec.py`](./src/guppy_gpu/cudaq_qec.py).
 Install using `pip` in your Guppy project environment:
 
 ```sh
-pip install git+https://github.com/CQCL/guppy-gpu.git
+pip install git+https://github.com/quantinuum/guppy-gpu.git
 ```
 
 ## Development
